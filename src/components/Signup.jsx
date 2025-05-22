@@ -1,44 +1,37 @@
 import React, { useState } from "react";
-import service from "../appwrite/config";
+import authService from "../appwrite/auth";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../store/authSlice";
-import { Button, Input, Logo } from "./index";
+import { Button, Input, Logo } from "./index.js";
 import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
-import authService from "../appwrite/auth";
-import React from "react";
 
-const Signup = () => {
+function Signup() {
   const navigate = useNavigate();
-  const [error, setError] = useState("");
+  const [error, setError] = useState();
   const dispatch = useDispatch();
-  const [register, handleSubmit] = useForm();
+  const { register, handleSubmit } = useForm();
 
   const create = async (data) => {
     setError("");
     try {
       const userData = await authService.createAccount(data);
-
       if (userData) {
         const userData = await authService.getCurrentUser();
-        if (userData) {
-          dispatch(login(userData));
-        }
 
+        if (userData) dispatch(login(userData));
         navigate("/");
       }
     } catch (error) {
-      setError(error.message);
+      setError(error);
     }
   };
   return (
-    <div className="flex item-center justify-center">
-      <div
-        className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}
-      >
-        <div className="mb-2 flex justify-center">
+    <div className="flex items-center justify-center">
+      <div className="mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10">
+        <div className="mb-2 flex justify-center ">
           <span className="inline-block w-full max-w-[100px]">
-            <Logo width="100px"></Logo>
+            <Logo width="100%"></Logo>
           </span>
         </div>
         <h2 className="text-center text-2xl font-bold leading-tight">
@@ -56,40 +49,47 @@ const Signup = () => {
         {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
 
         <form onSubmit={handleSubmit(create)}>
-            <div className="space-y-5">
-                <Input
-                label="Full Name: "
-                placeholder="Enter your full name"
-                {...register("name", {
-                    required: "Enter your full name"
-                })}
-                ></Input>
-                <Input 
-                label="Email: "
-                placeholder="Enter your email"
-                type="email"
-                {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                        value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+/,
-                        message: "Invalid email address"
-                    }
-                    
-                })}
-                ></Input>
-                <Input 
-                label="Password"
-                type="password"
-                placeholder="Enter your password"
-                {...register("password", {
-                    required: "Password is required"
-                })}
-                ></Input>
-            </div>
+          <div className="space-y-5">
+            {/* name field */}
+            <Input
+              label="Full Name: "
+              placeholder="Enter your full name"
+              {...register("name", {
+                required: "Full name is required",
+              })}
+            ></Input>
+
+            {/* email field */}
+            <Input
+              label="Email: "
+              placeholder="Enter your email"
+              type="email"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+/,
+                  message: "Invalid email address",
+                },
+              })}
+            ></Input>
+
+            {/* password field */}
+            <Input
+              label="Password: "
+              type="password"
+              placeholder="Enter your password"
+              {...register("password", {
+                required: "password is required",
+              })}
+            ></Input>
+            <Button type="submit" className="w-full">
+              Create Account
+            </Button>
+          </div>
         </form>
       </div>
     </div>
   );
-};
+}
 
 export default Signup;

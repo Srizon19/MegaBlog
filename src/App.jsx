@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import authService from './appwrite/auth';
 import { login,logout } from './store/authSlice';
 import { Header,Footer } from './components';
+import { Outlet } from 'react-router-dom';
 
 
 function App() {
@@ -15,25 +16,32 @@ function App() {
 
 
   const dispatch = useDispatch();
-  console.log(dispatch)
+  
 
   const [loading, setLoading] = useState(true);
 
 
   useEffect(()=>{
+    console.log("use Effect executed")
     authService.getCurrentUser()
     .then(userData => {
+      console.log(userData)
       if(userData){
         dispatch(login({userData}))
       }else{
         dispatch(logout());
       }
     })
-    .finally(()=>setLoading(false))
-  },[dispatch]);
+    .finally(()=>{
+      setLoading(false)
+      console.log("inside finally: ", loading)
+    })
+  },[]);
 
 
 
+
+  console.log("loading: ", loading)
   
   return !loading? (
     <>
@@ -41,9 +49,9 @@ function App() {
         <div className='w-full block'>
           <Header></Header>
           <main>
-            TODO: {/* {outlet} */}
+            <Outlet></Outlet>
           </main>
-          {/* <Footer></Footer> */}
+          <Footer></Footer>
         </div>
       </div>
     </>
